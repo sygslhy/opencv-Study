@@ -1,0 +1,45 @@
+
+#include "opencv/cv.h"  
+#include "opencv/highgui.h" 
+
+#define STATS_WIDTH  32
+#define STATS_HEIGHT 32
+uchar Blue[512*512];
+uchar Green[512*512];
+uchar Red[512*512];
+int main(int argc, char **argv)  
+{  
+        IplImage* pImage;  
+        if(argc==2 && (pImage=cvLoadImage(argv[1],1))!=0)  
+        {  
+                //cvNamedWindow("Image",1);  
+                //cvShowImage("Image",pImage);
+                printf("Image width = %d.\n", pImage->width );
+                printf("Image height = %d.\n", pImage->height);
+                printf("Image pixel depth = %d.\n", pImage->depth);
+                printf("Image pixel size = %d.\n", pImage->imageSize);
+                printf("Image pixel color channel = %d.\n", pImage->nChannels);
+                printf("Image pixel data order = %d.\n", pImage->dataOrder);
+                printf("Image pixel widthStep = %d.\n", pImage->widthStep);
+                //cvWaitKey(0); 
+                //cvDestroyWindow("Image"); 
+                
+                for(int y=0; y<pImage->height; y++){
+                    for(int x=0; x<pImage->widthStep; x+=3){
+                        Blue[y*pImage->width+(int)(x/3)]=pImage->imageData[y*pImage->widthStep+x];
+                        Green[y*pImage->width+(int)(x/3)]=pImage->imageData[y*pImage->widthStep+x+1];
+                        Red[y*pImage->width+(int)(x/3)]=pImage->imageData[y*pImage->widthStep+x+2];
+                    }
+                }
+/*
+                for(int y=0; y<pImage->height; y++){
+                    for(int x=0; x<pImage->width; x++){
+                        printf("[ %d, %d ] B=%d, G=%d, R=%d", y, x, (int)Blue[y*pImage->width+x], (int)Green[y*pImage->width+x], (int)Red[y*pImage->width+x]);
+                    }
+                }
+*/
+                cvReleaseImage(&pImage);  
+                return 0;  
+        }  
+        return -1;  
+}  
