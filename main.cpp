@@ -1,30 +1,49 @@
-#include "opencv2/highgui/highgui.hpp"
-using namespace cv;
-#include "iostream"
-using namespace std;
+#include	<opencv2/opencv.hpp>
+#include	<iostream>
+using	namespace	std;
+using	namespace	cv;
+int	main(int,	char	*argv[])
+{
+    Mat in_frame, out_frame;
+    const char win1[] = "Grabbing", win2[] = "Recording";
+    double fps = 30;
+    char file_out[] = "record.avi";
+    VideoCapture inVid(0);
+    if (!inVid.isOpened()){
+        cout << "Error, Camera is not ready" << endl;
+        return -1;
+    }
 
-#define STATS_WIDTH  32
-#define STATS_HEIGHT 32
-uchar Blue[512*512];
-uchar Green[512*512];
-uchar Red[512*512];
+    int width = (int)inVid.get(CAP_PROP_FRAME_WIDTH);
+    int height = (int)inVid.get(CAP_PROP_FRAME_HEIGHT);
 
-int main(int argc, char **argv){
-    Mat img = imread("lena.jpg");
-    Mat B = img.clone();
-    Mat C(img,  Rect(10, 10, 100, 100) );
-    //namedWindow("image", WINDOW_AUTOSIZE);
-    Mat M(2,2, CV_8UC3, Scalar(0,0,255));
-    cout << "M = " << endl << " " << M << endl << endl;
-    M.create(4,4, CV_8UC(2));
-    cout << "M = "<< endl << " "  << M << endl << endl;
-    Mat E = Mat::eye(4, 4, CV_64F);
-    cout << "E = " << endl << " " << E << endl << endl;
-    Mat O = Mat::ones(2, 2, CV_32F);
-    cout << "O = " << endl << " " << O << endl << endl;
-    Mat Z = Mat::zeros(3,3, CV_8UC1);
-    cout << "Z = " << endl << " " << Z << endl << endl;
-    //waitKey();
-    return 0;
+    cout << "witdh = " << width << " height = " << height << endl;
+
+    VideoWriter recVid(file_out,
+    VideoWriter::fourcc('M','P','E','G'),
+    fps, Size(width, height));
+
+    if (!recVid.isOpened()) {
+        cout << "Error! Video file not opened...\n";
+        return -1;
+    }
+
+    namedWindow(win1);
+    namedWindow(win2);
+
+    while (true) {
+        // Read frame from camera (grabbing and decoding)
+        inVid >> in_frame;
+        // Convert the frame to grayscale
+        cvtColor(in_frame, out_frame, COLOR_BGR2GRAY);
+        // Write frame to video file (encoding and saving)
+        recVid << out_frame;
+        imshow(win1, in_frame); // Show frame in window
+        imshow(win2, out_frame); // Show frame in window
+        if (waitKey(1000/fps) >= 0)
+        break;
+    }
+    inVid.release();
+
+    return	0;
 }
-
