@@ -4,46 +4,25 @@ using	namespace	std;
 using	namespace	cv;
 int	main(int,	char	*argv[])
 {
-    Mat in_frame, out_frame;
-    const char win1[] = "Grabbing", win2[] = "Recording";
-    double fps = 30;
-    char file_out[] = "record.avi";
-    VideoCapture inVid(0);
-    if (!inVid.isOpened()){
-        cout << "Error, Camera is not ready" << endl;
-        return -1;
+    Mat img = imread("lena.jpg", IMREAD_GRAYSCALE);
+    uchar pix1 = img.at<uchar>(0,0);
+    cout << " pixel is " << (unsigned int)pix1 << " at (0,0) " << endl;
+
+    Mat imgrgb = imread("lena.jpg", IMREAD_COLOR);
+    Vec3b pix2 = imgrgb.at<Vec3b>(0,0);
+    cout << " pixel B is " << (unsigned int)pix2[0] << " at (0,0) " << endl;
+    cout << " pixel G is " << (unsigned int)pix2[1] << " at (0,0) " << endl;
+    cout << " pixel R is " << (unsigned int)pix2[2] << " at (0,0) " << endl;
+
+    cout << " image size = " << imgrgb.size().height *imgrgb.size().width << endl;
+    for(int i=0; i<imgrgb.rows; i++){
+        Vec3b *ptr = imgrgb.ptr<Vec3b>(i);
+        for(int j=0; j<imgrgb.cols; j++){
+            uchar B = ptr[j][0];
+            uchar G = ptr[j][1];
+            uchar R = ptr[j][2];
+        }
     }
-
-    int width = (int)inVid.get(CAP_PROP_FRAME_WIDTH);
-    int height = (int)inVid.get(CAP_PROP_FRAME_HEIGHT);
-
-    cout << "witdh = " << width << " height = " << height << endl;
-
-    VideoWriter recVid(file_out,
-    VideoWriter::fourcc('M','P','E','G'),
-    fps, Size(width, height));
-
-    if (!recVid.isOpened()) {
-        cout << "Error! Video file not opened...\n";
-        return -1;
-    }
-
-    namedWindow(win1);
-    namedWindow(win2);
-
-    while (true) {
-        // Read frame from camera (grabbing and decoding)
-        inVid >> in_frame;
-        // Convert the frame to grayscale
-        cvtColor(in_frame, out_frame, COLOR_BGR2GRAY);
-        // Write frame to video file (encoding and saving)
-        recVid << out_frame;
-        imshow(win1, in_frame); // Show frame in window
-        imshow(win2, out_frame); // Show frame in window
-        if (waitKey(1000/fps) >= 0)
-        break;
-    }
-    inVid.release();
 
     return	0;
 }
